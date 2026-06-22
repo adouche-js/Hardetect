@@ -1,0 +1,72 @@
+{
+  "name": "hardetect",
+  "version": "1.0.0",
+  "description": "Detect device capabilities in-browser.",
+  "license": "MPL-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18",
+    "bun": ">=1.1.0"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adouche-js/Hardetect.git"
+  },
+  "bugs": {
+    "url": "https://github.com/adouche-js/Hardetect/issues"
+  },
+  "homepage": "https://github.com/adouche-js/Hardetect#readme",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json",
+    "./README.md": "./README.md"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ],
+  "keywords": [
+    "hardware",
+    "device-info",
+    "user-agent",
+    "capabilities"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "prettier --write \"**/*.{ts,md,json,html}\"",
+    "format:check": "prettier --check \"**/*.{ts,md,json,html}\"",
+    "clean": "rm -rf dist",
+    "benchmark": "node scripts/benchmark.mjs",
+    "benchmark:headed": "node scripts/benchmark.mjs --headed",
+    "benchmark:serve": "node scripts/benchmark-server.mjs",
+    "example": "node scripts/dev-server.mjs",
+    "prepublish": "npm run format && npm run build"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^20.19.43",
+    "happy-dom": "^15.11.7",
+    "playwright": "^1.61.0",
+    "prettier": "^3.8.4",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^1.6.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

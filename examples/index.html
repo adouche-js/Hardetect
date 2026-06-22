@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hardetect demo</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0e1117;
+        --panel: #161b22;
+        --border: #30363d;
+        --text: #c9d1d9;
+        --muted: #8b949e;
+        --accent: #58a6ff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+      }
+      body {
+        padding: 24px;
+      }
+      header {
+        max-width: 1100px;
+        margin: 0 auto 20px;
+      }
+      h1 {
+        margin: 0 0 8px 0;
+        font-size: 22px;
+        font-weight: 600;
+      }
+      p.lead {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13.5px;
+      }
+      main {
+        max-width: 1100px;
+        margin: 0 auto;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 18px;
+      }
+      .row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+      button {
+        font: inherit;
+        background: var(--accent);
+        color: #0d1117;
+        border: 0;
+        border-radius: 6px;
+        padding: 8px 14px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      button:hover {
+        filter: brightness(1.06);
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: wait;
+      }
+      .pill {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 99px;
+        background: #1f242c;
+        border: 1px solid var(--border);
+        font-size: 12px;
+        color: var(--muted);
+      }
+      pre {
+        margin: 0;
+        padding: 16px;
+        background: #0b0f15;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: auto;
+        max-height: 70vh;
+        font-size: 12.5px;
+        line-height: 1.5;
+      }
+      .null {
+        color: #6e7681;
+      }
+      .key {
+        color: #79c0ff;
+      }
+      .str {
+        color: #a5d6ff;
+      }
+      .num {
+        color: #f0883e;
+      }
+      .bool {
+        color: #d2a8ff;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Hardetect live demo</h1>
+      <p class="lead">
+        Calls <code>getHardwareProfile()</code> from the bundled ESM build and pretty-prints the
+        resulting JSON. Open your DevTools console for raw objects.
+      </p>
+    </header>
+
+    <main>
+      <div class="row">
+        <button id="run" type="button">Run detection</button>
+        <button id="copy" type="button" disabled>Copy JSON</button>
+        <span id="meta" class="pill">ready</span>
+      </div>
+      <pre id="output">click "Run detection"</pre>
+    </main>
+
+    <script type="module">
+      import { getHardwareProfile } from '../dist/index.js';
+
+      const out = document.getElementById('output');
+      const run = document.getElementById('run');
+      const copy = document.getElementById('copy');
+      const meta = document.getElementById('meta');
+
+      function syntaxHighlight(json) {
+        return json
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(
+            /("(\\.|[^"\\])*"(?:\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)/g,
+            (m) => {
+              let cls = 'num';
+              if (/^"/.test(m)) cls = /:$/.test(m) ? 'key' : 'str';
+              else if (/true|false/.test(m)) cls = 'bool';
+              else if (/null/.test(m)) cls = 'null';
+              return `<span class="${cls}">${m}</span>`;
+            },
+          );
+      }
+
+      async function runDetection() {
+        run.disabled = true;
+        meta.textContent = 'collecting…';
+        try {
+          const profile = await getHardwareProfile();
+          const json = JSON.stringify(profile, null, 2);
+          out.innerHTML = syntaxHighlight(json);
+          meta.textContent = `${profile.meta.durationMs} ms · schema ${profile.meta.schemaVersion}`;
+          copy.disabled = false;
+          copy.onclick = async () => {
+            try {
+              await navigator.clipboard.writeText(json);
+            } catch {
+              /* ignore */
+            }
+          };
+        } catch (err) {
+          out.textContent = `Error: ${err && err.message ? err.message : String(err)}`;
+          meta.textContent = 'error';
+        } finally {
+          run.disabled = false;
+        }
+      }
+
+      run.addEventListener('click', () => {
+        void runDetection();
+      });
+    </script>
+  </body>
+</html>

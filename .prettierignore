@@ -1,0 +1,7 @@
+dist
+node_modules
+**/*.d.ts
+bun.lockb
+bun.lock
+package-lock.json
+coverage

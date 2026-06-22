@@ -1,0 +1,71 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: MPL-2.0 -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Hardetect benchmark harness</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      html,
+      body {
+        background: #0e1117;
+        color: #c9d1d9;
+        font:
+          13px ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          Consolas,
+          monospace;
+        margin: 0;
+        padding: 12px;
+      }
+      pre {
+        margin: 0;
+        padding: 12px;
+        background: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 6px;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <pre id="out">pending…</pre>
+    <script type="module">
+      // Bootstraps the benchmark measurement.
+      //
+      // Exposes three signals on `window` so Playwright can read back
+      // the result without having to parse DOM HTML:
+      //   - `__hwReady`:  boolean - true once measurement + render done
+      //   - `__hwError`:  string  - non-null if measurement threw
+      //   - `__hwProfile`: object - the profile object returned by
+      //                         getHardwareProfile() (or null on error)
+
+      const out = document.getElementById('out');
+      window.__hwReady = false;
+      window.__hwError = null;
+      window.__hwProfile = null;
+
+      try {
+        // Relative import resolves to `${origin}/dist/index.js` when
+        // the static server hosts the project root.
+        const mod = await import('../dist/index.js');
+        if (typeof mod.getHardwareProfile !== 'function') {
+          throw new Error('getHardwareProfile is not a function on the loaded module');
+        }
+        const profile = await mod.getHardwareProfile();
+        window.__hwProfile = profile;
+        out.textContent = JSON.stringify(profile, null, 2);
+      } catch (err) {
+        window.__hwError = err && err.stack ? err.stack.split('\n', 1)[0] : String(err);
+        out.textContent = `ERROR: ${window.__hwError}`;
+      } finally {
+        window.__hwReady = true;
+      }
+    </script>
+  </body>
+</html>
