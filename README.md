@@ -62,6 +62,7 @@ console.log(profile);
     "deviceMemoryGB": 8,
     "isSafari": false,
     "isIOS": false,
+    "browserEngine": "gecko",
     "architecture": "arm",
     "bitness": "64",
     "model": null

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
-import type { SystemInfo, PartialError } from '../types.js';
+import type { SystemInfo, PartialError, BrowserEngine } from '../types.js';
 import { safeRun } from '../internal/safe-run.js';
 
 /**
@@ -43,6 +43,7 @@ export async function detectSystem(): Promise<SystemInfo> {
     deviceMemoryGB: sync.deviceMemoryGB,
     isSafari: sync.isSafari,
     isIOS: sync.isIOS,
+    browserEngine: sync.browserEngine,
     architecture: hevResult.value?.architecture ?? null,
     bitness: hevResult.value?.bitness ?? null,
     model: hevResult.value?.model ?? null,
@@ -79,6 +80,7 @@ export function detectSystemSync(): SystemInfo {
     deviceMemoryGB,
     isSafari: uaIsSafari(ua),
     isIOS: uaIsIOS(ua),
+    browserEngine: detectBrowserEngine(ua),
     architecture: null,
     bitness: null,
     model: null,
@@ -200,4 +202,14 @@ function uaIsIOS(ua: string): boolean {
     }
   }
   return false;
+}
+
+/** Best-effort browser engine detection from the User-Agent. Spoofable. */
+function detectBrowserEngine(ua: string): BrowserEngine {
+  if (!ua) return 'other';
+  const lower = ua.toLowerCase();
+  if (lower.includes('firefox')) return 'gecko';
+  if (lower.includes('chrome') || lower.includes('chromium')) return 'chromium';
+  if (lower.includes('safari') && lower.includes('version/')) return 'webkit';
+  return 'other';
 }

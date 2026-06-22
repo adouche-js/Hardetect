@@ -73,6 +73,16 @@ export interface CpuInfo {
   benchmarkScore: number | null;
 }
 
+/**
+ * Browser engine family determined from the User-Agent.
+ *
+ * - `'chromium'`: Chrome, Edge, Opera, Brave, and other Chromium-based browsers.
+ * - `'gecko'`:    Firefox and other Gecko-based browsers.
+ * - `'webkit'`:   Safari and other WebKit-based browsers.
+ * - `'other'`:    Anything else (including server-side runtimes like Node.js).
+ */
+export type BrowserEngine = 'chromium' | 'gecko' | 'webkit' | 'other';
+
 /** Values returned by `detectSystem()`. */
 export interface SystemInfo {
   /** `navigator.deviceMemory`, approximation of RAM in GB. Chromium-only. */
@@ -81,6 +91,8 @@ export interface SystemInfo {
   isSafari: boolean;
   /** Best-effort detection from the User-Agent. Spoofable. */
   isIOS: boolean;
+  /** Best-effort detection from the User-Agent. Spoofable. */
+  browserEngine: BrowserEngine;
   /** Reported CPU architecture (e.g. `"arm"`, `"x86"`). Chromium-only. */
   architecture: string | null;
   /** Reported CPU bitness (e.g. `"64"`). Chromium-only. */

@@ -20,6 +20,7 @@ const EXPECTED_CPU_KEYS = [
   'benchmarkScore',
 ].sort();
 const EXPECTED_SYSTEM_KEYS = [
+  'browserEngine',
   'deviceMemoryGB',
   'isSafari',
   'isIOS',
